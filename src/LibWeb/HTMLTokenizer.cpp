@@ -161,6 +161,113 @@ namespace Web {
                 assert(false);
                 break;
             
+            case State::TagName:
+                if (CURRENT_INPUT_CHAR_IS_WHITESPACE) {
+                    SET_STATE_AND_BREAK(State::BeforeAttributeName);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('/')) {
+                    SET_STATE_AND_BREAK(State::SelfClosingStartTag);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('>')) {
+                    SET_STATE_AND_EMIT_TOKEN(State::Data);
+                }
+
+                if (ANYTHING_ELSE) {
+                    m_current_token.m_tag.tag_name.push_back(current_input_char.value());
+                    continue;
+                }
+                assert(false);
+                break;
+            
+            case State::EndTagOpen:
+                if (CURRENT_INPUT_CHAR_IS_ALPHA) {
+                    SET_CURRENT_TOKEN(HTMLToken::Type::EndTag);
+                    SET_STATE_DEC_CURSOR_AND_BREAK(State::TagName);
+                }
+                assert(false);
+                break;
+            
+            case State::BeforeAttributeName:
+                if (CURRENT_INPUT_CHAR_IS_WHITESPACE) {
+                    continue;
+                }
+
+                if (ANYTHING_ELSE) {
+                    m_current_token.m_tag.attributes.push_back(std::make_pair("", ""));
+                    SET_STATE_DEC_CURSOR_AND_BREAK(State::AttributeName);
+                }
+                assert(false);
+                break;
+            
+            case State::AttributeName:
+                if (CURRENT_INPUT_CHAR_IS_WHITESPACE || CURRENT_INPUT_CHAR_IS('/') || CURRENT_INPUT_CHAR_IS('>')) {
+                    SET_STATE_DEC_CURSOR_AND_BREAK(State::AfterAttributeName);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('=')) {
+                    SET_STATE_AND_BREAK(State::BeforeAttributeValue);
+                }
+
+                if (ANYTHING_ELSE) {
+                    m_current_token.m_tag.attributes.back().first.push_back(current_input_char.value());
+                    continue;
+                }
+                assert(false);
+                break;
+            
+            case State::AfterAttributeName:
+                assert(false);
+                break;
+            
+            case State::BeforeAttributeValue:
+                if (CURRENT_INPUT_CHAR_IS_WHITESPACE) {
+                    continue;
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('\"')) {
+                    SET_STATE_AND_BREAK(State::AttributeValueDoubleQuoted);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('\'')) {
+                    SET_STATE_AND_BREAK(State::AttributeValueSingleQuoted);
+                }
+
+                assert(false);
+                break;
+            
+            case State::AttributeValueDoubleQuoted:
+                if (CURRENT_INPUT_CHAR_IS('\"')) {
+                    SET_STATE_AND_BREAK(State::AfterAttributeValueQuoted);
+                }
+
+                if (ANYTHING_ELSE) {
+                    m_current_token.m_tag.attributes.back().second.push_back(current_input_char.value());
+                    continue;
+                }
+                assert(false);
+                break;
+            
+            case State::AfterAttributeValueQuoted:
+                if (CURRENT_INPUT_CHAR_IS_WHITESPACE) {
+                    SET_STATE_AND_BREAK(State::BeforeAttributeName);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('/')) {
+                    SET_STATE_AND_BREAK(State::SelfClosingStartTag);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('>')) {
+                    SET_STATE_AND_EMIT_TOKEN(State::Data);
+                }
+                assert(false);
+                break;
+            
+            case State::SelfClosingStartTag:
+                assert(false);
+                break;
+            
             case State::CharacterReference:
                 assert(false);
                 break;

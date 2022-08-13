@@ -35,7 +35,11 @@ namespace Web {
         {
             s.append(" { name: '");
             s.append(m_tag.tag_name);
-            s.append("' }");
+            s.append("'");
+            for(auto i : m_tag.attributes) {
+                s.append(" " + i.first + "=" + i.second + " ");
+            }
+            s.append(" }");
         }
 
         return s;

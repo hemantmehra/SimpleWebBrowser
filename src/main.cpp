@@ -4,9 +4,12 @@
 
 int main(int argc, char const *argv[])
 {
-    Web::HTMLTokenizer html_tokenizer("<!DOCTYPE html>");
+    std::string source = "<!DOCTYPE html><html lang=\"en\"><head></head></html>";
+
+    Web::HTMLTokenizer html_tokenizer(source);
     html_tokenizer.source();
     std::cout << std::string(50, '-') << std::endl;
+    
     Web::HTMLToken token;
     do
     {
