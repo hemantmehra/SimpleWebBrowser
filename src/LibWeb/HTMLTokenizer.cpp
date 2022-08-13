@@ -265,6 +265,10 @@ namespace Web {
                 break;
             
             case State::SelfClosingStartTag:
+                if (CURRENT_INPUT_CHAR_IS('>')) {
+                    m_current_token.m_tag.self_closing = true;
+                    SET_STATE_AND_EMIT_TOKEN(State::Data);
+                }
                 assert(false);
                 break;
             
