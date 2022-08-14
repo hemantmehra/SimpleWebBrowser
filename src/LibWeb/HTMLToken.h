@@ -8,6 +8,7 @@ namespace Web {
     class HTMLToken
     {
         friend class HTMLTokenizer;
+        friend class HTMLParser;
     public:
         enum class Type
         {

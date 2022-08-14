@@ -1,21 +1,15 @@
 #include <iostream>
-#include <HTMLToken.h>
-#include <HTMLTokenizer.h>
+#include <HTMLParser.h>
 
 int main(int argc, char const *argv[])
 {
     std::string source = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head></html>";
-
-    Web::HTMLTokenizer html_tokenizer(source);
-    html_tokenizer.source();
+    std::cout << source << std::endl;
     std::cout << std::string(50, '-') << std::endl;
 
-    Web::HTMLToken token;
-    do
-    {
-        token = html_tokenizer.next_token();
-        std::cout << token.to_string() << std::endl;
-    } while (token.to_string() != "EndOfFile");
+    Web::HTMLParser html_parser(source);
+    html_parser.run();
+    std::cout << std::string(50, '-') << std::endl;
 
     return 0;
 }
