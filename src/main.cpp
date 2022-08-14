@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
     std::cout << std::string(50, '-') << std::endl;
 
     std::string s;
-    Web::dump_document(s, html_parser.document());
+    Web::dump_tree(s, html_parser.document(), 0);
     std::cout << s << std::endl;
 
     return 0;

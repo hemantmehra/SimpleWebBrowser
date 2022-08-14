@@ -5,4 +5,9 @@ namespace Web::DOM {
         : m_document(&document)
         , m_type(type)
     {}
+
+    void Node::append_child(Node* node)
+    {
+        m_child_nodes.push_back(node);
+    }
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <vector>
 #include <Forward.h>
 
 namespace Web::DOM {
@@ -23,7 +25,7 @@ namespace Web::DOM {
     {
     public:
         Node(NodeType type);
-        
+
         NodeType type() const { return m_type; }
         bool is_element() const { return type() == NodeType::ELEMENT_NODE; }
         bool is_text() const { return type() == NodeType::TEXT_NODE; }
@@ -37,11 +39,16 @@ namespace Web::DOM {
         bool is_attribute() const { return type() == NodeType::ATTRIBUTE_NODE; }
         bool is_cdata_section() const { return type() == NodeType::CDATA_SECTION_NODE; }
 
+        std::vector<Node*>& child_nodes() { return m_child_nodes; }
+        void append_child(Node*);
+        virtual std::string to_string() = 0;
     protected:
         Node(Document&, NodeType);
 
         Document* m_document { nullptr };
         NodeType m_type { NodeType::INVALID };
-    // private:
+    
+    private:
+        std::vector<Node*> m_child_nodes;
     };
 }

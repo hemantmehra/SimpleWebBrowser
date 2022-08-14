@@ -8,10 +8,7 @@ namespace Web::DOM {
     {
     public:
         Document();
-        void append_child(Node*);
-        std::vector<Node*>& children() { return m_children; }
-
+        std::string to_string() override { return "*Document*"; }
     private:
-        std::vector<Node*> m_children;
     };
 }
