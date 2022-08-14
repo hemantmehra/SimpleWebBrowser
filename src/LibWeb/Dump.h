@@ -4,5 +4,5 @@
 #include <Forward.h>
 
 namespace Web {
-    void dump_tree(std::string&, DOM::Node&);
+    void dump_document(std::string&, DOM::Document&);
 }

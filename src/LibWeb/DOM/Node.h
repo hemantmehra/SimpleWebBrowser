@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Forward.h>
+
 namespace Web::DOM {
     enum class NodeType {
         INVALID = 0,
@@ -35,7 +37,11 @@ namespace Web::DOM {
         bool is_attribute() const { return type() == NodeType::ATTRIBUTE_NODE; }
         bool is_cdata_section() const { return type() == NodeType::CDATA_SECTION_NODE; }
 
-    private:
+    protected:
+        Node(Document&, NodeType);
+
+        Document* m_document { nullptr };
         NodeType m_type { NodeType::INVALID };
+    // private:
     };
 }

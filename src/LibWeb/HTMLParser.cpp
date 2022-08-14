@@ -1,4 +1,5 @@
 #include <HTMLParser.h>
+#include <DOM/DocumentType.h>
 
 namespace Web
 {
@@ -11,6 +12,7 @@ namespace Web
 
     void HTMLParser::run()
     {
+        m_document = new DOM::Document;
         for (;;)
         {
             auto token = m_tokenizer.next_token();
@@ -26,11 +28,18 @@ namespace Web
             case InsertionMode::Initial:
                 if (token.type() == HTMLToken::Type::DOCTYPE)
                 {
-                    
+                    auto doctype = new DOM::DocumentType(document());
+                    doctype->set_name(token.m_doctype.name);
+                    m_document->append_child(doctype);
+                    m_insertion_mode = InsertionMode::BeforeHtml;
                 }
                 break;
             
+            case InsertionMode::BeforeHtml:
+                break;
+            
             default:
+                assert(false);
                 break;
             }
         }
@@ -45,5 +54,10 @@ namespace Web
 #undef __ENUMERATE_INSERTION_MODE
         }
         assert(false);
+    }
+
+    DOM::Document& HTMLParser::document()
+    {
+        return *m_document;
     }
 }

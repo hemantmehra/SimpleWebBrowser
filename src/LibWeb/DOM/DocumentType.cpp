@@ -2,6 +2,7 @@
 #include <DOM/DocumentType.h>
 
 namespace Web::DOM {
-    DocumentType::DocumentType() : Node(NodeType::DOCUMENT_TYPE_NODE)
+    DocumentType::DocumentType(Document& document)
+        : Node(document, NodeType::DOCUMENT_TYPE_NODE)
     {}
 }

@@ -2,6 +2,7 @@
 #include <vector>
 #include <HTMLTokenizer.h>
 #include <DOM/Node.h>
+#include <DOM/Document.h>
 
 #define ENUMERATE_INSERTION_MODES \
 		__ENUMERATE_INSERTION_MODE(Initial) \
@@ -46,6 +47,7 @@ namespace Web
         };
 
         InsertionMode insertion_mode() const { return m_insertion_mode; }
+		DOM::Document& document();
 
     private:
         const char* insertion_mode_name() const;
@@ -53,5 +55,6 @@ namespace Web
         std::vector<DOM::Node*> m_stack_of_open_elements;
 
         HTMLTokenizer m_tokenizer;
+		DOM::Document* m_document;
     };
 }

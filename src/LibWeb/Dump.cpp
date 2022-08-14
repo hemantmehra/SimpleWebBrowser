@@ -3,9 +3,10 @@
 #include <DOM/Document.h>
 
 namespace Web {
-    void dump_tree(std::string& str, DOM::Node& node) {
-        if (node.is_document()) {
-            str.append("Document\n");
-        }
+    void dump_document(std::string& str, DOM::Document& document) {
+        str.append("Document\n");
+            for(auto i : document.children()) {
+                str.append(" doctype\n");
+            }
     }
 }

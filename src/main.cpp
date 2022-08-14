@@ -1,5 +1,6 @@
 #include <iostream>
 #include <HTMLParser.h>
+#include <Dump.h>
 
 int main(int argc, char const *argv[])
 {
@@ -10,6 +11,10 @@ int main(int argc, char const *argv[])
     Web::HTMLParser html_parser(source);
     html_parser.run();
     std::cout << std::string(50, '-') << std::endl;
+
+    std::string s;
+    Web::dump_document(s, html_parser.document());
+    std::cout << s << std::endl;
 
     return 0;
 }
