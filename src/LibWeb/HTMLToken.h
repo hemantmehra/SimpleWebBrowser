@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <string>
 #include <vector>
 #include <Forward.h>
@@ -19,6 +20,19 @@ namespace Web {
             Character,
             EndOfFile
         };
+
+        bool is_doctype () const { return type() == Type::DOCTYPE; }
+        bool is_start_tag() const { return type() == Type::StartTag; }
+        bool is_end_tag() const { return type() == Type::EndTag; }
+        bool is_comment() const { return type() == Type::Comment; }
+        bool is_character() const { return type() == Type::Character; }
+        bool is_end_of_file () const { return type() == Type::EndOfFile; }
+
+        std::string tag_name() const
+        {
+            assert(is_start_tag() || is_end_tag());
+            return m_tag.tag_name;
+        }
 
         Type type() const { return m_type; }
         std::string to_string() const;
