@@ -10,6 +10,8 @@ namespace Web::DOM {
         DocumentType(Document&);
         const std::string& name() const { return m_name; }
         void set_name(const std::string& name) { m_name = name; }
+
+        std::string tag_name() override { return ""; }
         std::string to_string() override { return "<!DOCTYPE " + m_name + ">"; }
     
     private:

@@ -17,12 +17,7 @@ namespace Web
         for (;;)
         {
             auto token = m_tokenizer.next_token();
-            if (token.to_string() == "EndOfFile") return;
-
             std::cout << "[" << insertion_mode_name() << "] " << token.to_string() << std::endl;
-
-            if (token.type() == HTMLToken::Type::EndOfFile)
-                return;
 
             switch (m_insertion_mode)
             {
@@ -45,10 +40,25 @@ namespace Web
             case InsertionMode::AfterHead:
                 handle_after_head(token);
                 break;
+
+            case InsertionMode::InBody:
+                handle_in_body(token);
+                break;
+            
+            case InsertionMode::AfterBody:
+                handle_after_body(token);
+                break;
+
+            case InsertionMode::AfterAfterBody:
+                handle_after_after_body(token);
+                break;
             
             default:
                 assert(false);
             }
+
+            if (token.type() == HTMLToken::Type::EndOfFile)
+                return;
         }
     }
 
@@ -157,7 +167,10 @@ namespace Web
         }
 
         if (token.is_start_tag() && token.tag_name() == "body") {
-            assert(false);
+            auto element = insert_html_element(token);
+            m_frameset_ok = false;
+            m_insertion_mode = InsertionMode::InBody;
+            return;
         }
 
         if (token.is_start_tag() && token.tag_name() == "frameset") {
@@ -194,6 +207,94 @@ namespace Web
             insert_html_element(dummy_body_token);
             m_insertion_mode = InsertionMode::InBody;
             return;
+        assert(false);
+    }
+
+    void HTMLParser::generate_implied_end_tags()
+    {
+        std::vector names{ "dd", "dt", "li", "optgroup", "option", \
+        "p", "rb", "rp", "rt", "rtc" };
+
+        while ((std::find(names.begin(), names.end(), current_node()->tag_name()) != names.end())) {
+            m_stack_of_open_elements.pop_back();
+        }
+    }
+
+    bool HTMLParser::stack_of_open_elements_has_element_with_tag_name_in_scope(std::string tag_name) {
+        std::vector list{ "applet", "caption", "html", "table", "td", "th", "marquee", "object", "template" };
+        for (size_t i = m_stack_of_open_elements.size() - 1; i > 0; --i) {
+            auto& node = m_stack_of_open_elements.at(i);
+            if (node->tag_name() == tag_name)
+                return true;
+            if ((std::find(list.begin(), list.end(), node->tag_name()) != list.end())) {
+                return false;
+            }
+        }
+        assert(false);
+    }
+
+    void HTMLParser::handle_in_body(HTMLToken& token)
+    {
+        if (token.is_end_tag() && token.tag_name() == "body") {
+            if (!stack_of_open_elements_has_element_with_tag_name_in_scope("body")) {
+                assert(false);
+            }
+
+            m_insertion_mode = InsertionMode::AfterBody;
+            return;
+        }
+
+        {
+            std::vector names = {"address", "article", "aside", "blockquote", \
+            "center", "details", "dialog", "dir", "div", "dl", "fieldset", "figcaption", \
+            "figure", "footer", "header", "hgroup", "main", "menu", "nav", "ol", "p", "section", "summary", "ul"};
+            if (token.is_start_tag() && (std::find(names.begin(), names.end(), token.tag_name()) != names.end())) {
+                insert_html_element(token);
+                return;
+            }
+        }
+        
+        {
+            std::vector names = {"address", "article", "aside", "blockquote", \
+            "button", "center", "details", "dialog", "dir", "div", "dl", "fieldset", \
+            "figcaption", "figure", "footer", "header", "hgroup", "listing", "main", "menu", \
+            "nav", "ol", "pre", "section", "summary", "ul"};
+            if (token.is_end_tag() && (std::find(names.begin(), names.end(), token.tag_name()) != names.end())) {
+                if (!stack_of_open_elements_has_element_with_tag_name_in_scope(token.tag_name())) {
+                    assert(false);
+                }
+
+                generate_implied_end_tags();
+
+                if (current_node()->tag_name() != token.tag_name()) {
+                    assert(false);
+                }
+
+                m_stack_of_open_elements.pop_back();
+                return;
+            }
+        }
+        assert(false);
+    }
+
+    void HTMLParser::handle_after_body(HTMLToken& token)
+    {
+        if (token.is_end_tag() && token.tag_name() == "html") {
+            if (m_parsing_fragment) {
+                assert(false);
+            }
+            m_insertion_mode = InsertionMode::AfterAfterBody;
+            return;
+        }
+        assert(false);
+    }
+
+    void HTMLParser::handle_after_after_body(HTMLToken& token)
+    {
+        if (token.is_end_of_file()) {
+            std::cout << "End of parsing!" << std::endl;
+            return;
+        }
         assert(false);
     }
 

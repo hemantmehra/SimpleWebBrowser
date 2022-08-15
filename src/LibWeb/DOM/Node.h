@@ -41,6 +41,8 @@ namespace Web::DOM {
 
         std::vector<Node*>& child_nodes() { return m_child_nodes; }
         void append_child(Node*);
+
+        virtual std::string tag_name() = 0;
         virtual std::string to_string() = 0;
     protected:
         Node(Document&, NodeType);

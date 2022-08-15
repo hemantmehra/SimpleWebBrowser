@@ -8,6 +8,7 @@ namespace Web::DOM {
     {
     public:
         Element(Document&, std::string tag_name);
+        std::string tag_name() override { return m_tag_name; }
         std::string to_string() override;
         void set_attribute(std::pair<std::string, std::string> attribute);
     

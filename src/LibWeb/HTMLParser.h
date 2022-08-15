@@ -56,11 +56,16 @@ namespace Web
         void handle_before_head(HTMLToken&);
         void handle_in_head(HTMLToken&);
         void handle_after_head(HTMLToken&);
+        void handle_in_body(HTMLToken&);
+        void handle_after_body(HTMLToken&);
+        void handle_after_after_body(HTMLToken&);
 
         DOM::Node* current_node();
         DOM::Node* find_appropriate_place_for_inserting_node();
         DOM::Element* create_element_for(HTMLToken& token);
         DOM::Element* insert_html_element(HTMLToken& token);
+        void generate_implied_end_tags();
+        bool stack_of_open_elements_has_element_with_tag_name_in_scope(std::string tag_name);
 
         const char* insertion_mode_name() const;
         InsertionMode m_insertion_mode{ InsertionMode::Initial };
@@ -72,5 +77,7 @@ namespace Web
         DOM::Element* m_form_element;
 
         bool m_foster_parenting{ false };
+        bool m_frameset_ok{ true };
+        bool m_parsing_fragment{ false };
     };
 }
