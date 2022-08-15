@@ -39,7 +39,11 @@ namespace Web
                 break;
             
             case InsertionMode::InHead:
-                // handle_in_head(token);
+                handle_in_head(token);
+                break;
+            
+            case InsertionMode::AfterHead:
+                handle_after_head(token);
                 break;
             
             default:
@@ -64,7 +68,7 @@ namespace Web
     void HTMLParser::handle_before_html(HTMLToken& token)
     {
         if (token.is_start_tag() && token.tag_name() == "html") {
-            auto element = DOM::create_element(document(), token.tag_name());
+            auto element = create_element_for(token);
             document().append_child(element);
             m_stack_of_open_elements.push_back(element);
             m_insertion_mode = InsertionMode::BeforeHead;
@@ -86,10 +90,19 @@ namespace Web
         return m_stack_of_open_elements.back();
     }
 
+    DOM::Element* HTMLParser::create_element_for(HTMLToken& token)
+    {
+        auto element = DOM::create_element(document(), token.tag_name());
+        for (auto& attribute : token.m_tag.attributes) {
+            element->set_attribute(attribute);
+        }
+        return element;
+    }
+
     DOM::Element* HTMLParser::insert_html_element(HTMLToken& token)
     {
         auto adjusted_insertion_location = find_appropriate_place_for_inserting_node();
-        auto element = DOM::create_element(document(), token.tag_name());
+        auto element = create_element_for(token);
         adjusted_insertion_location->append_child(element);
         m_stack_of_open_elements.push_back(element);
         return element;
@@ -103,6 +116,84 @@ namespace Web
             m_insertion_mode = InsertionMode::InHead;
             return;
         }
+        assert(false);
+    }
+
+    void HTMLParser::handle_in_head(HTMLToken& token)
+    {
+        if (token.is_start_tag() && token.tag_name() == "meta") {
+            auto element = insert_html_element(token);
+            m_stack_of_open_elements.pop_back();
+            if (token.is_self_closing()) {
+                assert(false);
+            }
+            return;
+        }
+
+        if (token.is_end_tag() && token.tag_name() == "head") {
+            m_stack_of_open_elements.pop_back();
+            m_insertion_mode = InsertionMode::AfterHead;
+            return;
+        }
+        assert(false);
+    }
+
+    void HTMLParser::handle_after_head(HTMLToken& token)
+    {
+        if (token.is_character()) {
+            assert(false);
+        }
+
+        if (token.is_comment()) {
+            assert(false);
+        }
+
+        if (token.is_doctype()) {
+            assert(false);
+        }
+
+        if (token.is_start_tag() && token.tag_name() == "html") {
+            assert(false);
+        }
+
+        if (token.is_start_tag() && token.tag_name() == "body") {
+            assert(false);
+        }
+
+        if (token.is_start_tag() && token.tag_name() == "frameset") {
+            assert(false);
+        }
+
+        {
+            std::vector names = {"base", "basefont", "bgsound", "link", "meta", "noframes", "script", "style", "template", "title"};
+            if (std::find(names.begin(), names.end(), token.tag_name()) != names.end()) {
+                assert(false);
+            }
+        }
+
+        if (token.is_end_tag() && token.tag_name() == "template") {
+            assert(false);
+        }
+
+        if (token.is_end_tag()
+            && ((token.tag_name() == "body")
+                || (token.tag_name() == "html")
+                || (token.tag_name() == "br"))) {
+
+            goto AythingElse;
+        }
+
+        if ((token.is_start_tag() && token.tag_name() == "head") || token.is_end_tag()) {
+            assert(false);
+        }
+
+        AythingElse:
+            HTMLToken dummy_body_token;
+            dummy_body_token.m_type = HTMLToken::Type::StartTag;
+            dummy_body_token.m_tag.tag_name.append("body");
+            insert_html_element(dummy_body_token);
+            m_insertion_mode = InsertionMode::InBody;
+            return;
         assert(false);
     }
 

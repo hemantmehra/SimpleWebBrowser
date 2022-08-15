@@ -54,10 +54,13 @@ namespace Web
         void handle_initial(HTMLToken&);
         void handle_before_html(HTMLToken&);
         void handle_before_head(HTMLToken&);
+        void handle_in_head(HTMLToken&);
+        void handle_after_head(HTMLToken&);
 
-        DOM::Node* find_appropriate_place_for_inserting_node();
-        DOM::Element* insert_html_element(HTMLToken& token);
         DOM::Node* current_node();
+        DOM::Node* find_appropriate_place_for_inserting_node();
+        DOM::Element* create_element_for(HTMLToken& token);
+        DOM::Element* insert_html_element(HTMLToken& token);
 
         const char* insertion_mode_name() const;
         InsertionMode m_insertion_mode{ InsertionMode::Initial };

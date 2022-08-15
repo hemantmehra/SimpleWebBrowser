@@ -4,7 +4,7 @@
 
 int main(int argc, char const *argv[])
 {
-    std::string source = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"></head></html>";
+    std::string source = "<!DOCTYPE html><html><head><meta content=\"Hello There!\"></head></html>";
     std::cout << source << std::endl;
     std::cout << std::string(50, '-') << std::endl;
 

@@ -34,6 +34,12 @@ namespace Web {
             return m_tag.tag_name;
         }
 
+        bool is_self_closing() const
+        {
+            assert(is_start_tag() || is_end_tag());
+            return m_tag.self_closing;
+        }
+
         Type type() const { return m_type; }
         std::string to_string() const;
 
