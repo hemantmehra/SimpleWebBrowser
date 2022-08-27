@@ -1,6 +1,7 @@
 #include <HTMLParser.h>
 #include <DOM/DocumentType.h>
 #include <DOM/ElementFactory.h>
+#include <DOM/Text.h>
 
 namespace Web
 {
@@ -77,6 +78,10 @@ namespace Web
 
     void HTMLParser::handle_before_html(HTMLToken& token)
     {
+        if (token.is_character() && token.is_parser_whitespace()) {
+            return;
+        }
+
         if (token.is_start_tag() && token.tag_name() == "html") {
             auto element = create_element_for(token);
             document().append_child(element);
@@ -120,6 +125,10 @@ namespace Web
 
     void HTMLParser::handle_before_head(HTMLToken& token)
     {
+        if (token.is_character() && token.is_parser_whitespace()) {
+            return;
+        }
+        
         if (token.is_start_tag() && token.tag_name() == "head") {
             auto element = insert_html_element(token);
             m_head_element = element;
@@ -148,9 +157,30 @@ namespace Web
         assert(false);
     }
 
-    void HTMLParser::handle_after_head(HTMLToken& token)
+    void HTMLParser::insert_character(uint32_t data)
     {
+        auto adjusted_insertion_location = find_appropriate_place_for_inserting_node();
+        if (adjusted_insertion_location->is_document())
+            return;
+        if (adjusted_insertion_location->last_child() && adjusted_insertion_location->last_child()->is_text()) {
+            auto exisiting_text_node = (DOM::Text*)(adjusted_insertion_location->last_child());
+            std::string s = exisiting_text_node->data();
+            s.push_back(data);
+            exisiting_text_node->set_data(s);
+            return;
+        }
+        std::string s;
+        s.push_back(data);
+        adjusted_insertion_location->append_child(new DOM::Text(document(), s));
+    }
+
+    void HTMLParser::handle_after_head(HTMLToken& token)
+    {   
         if (token.is_character()) {
+            if (token.is_parser_whitespace()) {
+                insert_character(token.character());
+                return;
+            }
             assert(false);
         }
 
@@ -235,6 +265,18 @@ namespace Web
 
     void HTMLParser::handle_in_body(HTMLToken& token)
     {
+        if (token.is_character()) {
+            if (token.character() == 0) {
+                assert(false);
+            }
+
+            if (token.is_parser_whitespace()) {
+                // reconstruct_the_active_formatting_elements();
+                insert_character(token.character());
+                return;
+            }
+        }
+
         if (token.is_end_tag() && token.tag_name() == "body") {
             if (!stack_of_open_elements_has_element_with_tag_name_in_scope("body")) {
                 assert(false);

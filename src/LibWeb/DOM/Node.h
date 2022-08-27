@@ -41,6 +41,7 @@ namespace Web::DOM {
 
         std::vector<Node*>& child_nodes() { return m_child_nodes; }
         void append_child(Node*);
+        Node* last_child();
 
         virtual std::string tag_name() = 0;
         virtual std::string to_string() = 0;
@@ -52,5 +53,6 @@ namespace Web::DOM {
     
     private:
         std::vector<Node*> m_child_nodes;
+        Node* m_last_child { nullptr };
     };
 }

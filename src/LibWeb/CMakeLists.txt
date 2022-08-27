@@ -21,6 +21,8 @@ target_sources(LibWeb
     ${CMAKE_CURRENT_LIST_DIR}/DOM/Node.h
     ${CMAKE_CURRENT_LIST_DIR}/DOM/Document.h
     ${CMAKE_CURRENT_LIST_DIR}/DOM/DocumentType.h
+    ${CMAKE_CURRENT_LIST_DIR}/DOM/CharacterData.h
+    ${CMAKE_CURRENT_LIST_DIR}/DOM/Text.h
   )
 
 target_include_directories(LibWeb

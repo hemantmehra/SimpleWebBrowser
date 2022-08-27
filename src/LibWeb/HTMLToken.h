@@ -28,6 +28,32 @@ namespace Web {
         bool is_character() const { return type() == Type::Character; }
         bool is_end_of_file () const { return type() == Type::EndOfFile; }
 
+        uint32_t character() const
+        {
+            assert(is_character());
+            assert(m_comment_or_character.data.length() == 1);
+            return m_comment_or_character.data[0];
+        }
+
+        bool is_parser_whitespace() const
+        {
+            if (!is_character()) {
+                return false;
+            }
+            
+            switch (character())
+            {
+            case '\t':
+            case '\n':
+            case '\f':
+            case '\r':
+            case ' ':
+                return true;
+            default:
+                return false;
+            }
+        }
+
         std::string tag_name() const
         {
             assert(is_start_tag() || is_end_tag());
