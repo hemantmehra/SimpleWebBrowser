@@ -67,10 +67,13 @@ namespace Web
         void insert_character(uint32_t data);
         void generate_implied_end_tags();
         bool stack_of_open_elements_has_element_with_tag_name_in_scope(std::string tag_name);
+        void reconstruct_the_active_formatting_elements();
+        void process_using_the_rules_for(InsertionMode, HTMLToken&);
 
         const char* insertion_mode_name() const;
         InsertionMode m_insertion_mode{ InsertionMode::Initial };
         std::vector<DOM::Node*> m_stack_of_open_elements;
+        std::vector<DOM::Element*> m_list_of_active_formatting_elements;
 
         HTMLTokenizer m_tokenizer;
         DOM::Document* m_document;

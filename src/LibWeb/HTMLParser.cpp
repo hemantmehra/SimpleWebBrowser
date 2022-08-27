@@ -20,7 +20,16 @@ namespace Web
             auto token = m_tokenizer.next_token();
             std::cout << "[" << insertion_mode_name() << "] " << token.to_string() << std::endl;
 
-            switch (m_insertion_mode)
+            process_using_the_rules_for(m_insertion_mode, token);
+
+            if (token.type() == HTMLToken::Type::EndOfFile)
+                return;
+        }
+    }
+
+    void HTMLParser::process_using_the_rules_for(InsertionMode mode, HTMLToken& token)
+    {
+        switch (mode)
             {
             case InsertionMode::Initial:
                 handle_initial(token);
@@ -57,10 +66,6 @@ namespace Web
             default:
                 assert(false);
             }
-
-            if (token.type() == HTMLToken::Type::EndOfFile)
-                return;
-        }
     }
 
     void HTMLParser::handle_initial(HTMLToken& token)
@@ -263,6 +268,14 @@ namespace Web
         assert(false);
     }
 
+    void HTMLParser::reconstruct_the_active_formatting_elements()
+    {
+        if (m_list_of_active_formatting_elements.empty())
+            return;
+
+        assert(false);
+    }
+
     void HTMLParser::handle_in_body(HTMLToken& token)
     {
         if (token.is_character()) {
@@ -271,7 +284,7 @@ namespace Web
             }
 
             if (token.is_parser_whitespace()) {
-                // reconstruct_the_active_formatting_elements();
+                reconstruct_the_active_formatting_elements();
                 insert_character(token.character());
                 return;
             }
@@ -321,6 +334,11 @@ namespace Web
 
     void HTMLParser::handle_after_body(HTMLToken& token)
     {
+        if (token.is_character() && token.is_parser_whitespace()) {
+            process_using_the_rules_for(InsertionMode::InBody, token);
+            return;
+        }
+
         if (token.is_end_tag() && token.tag_name() == "html") {
             if (m_parsing_fragment) {
                 assert(false);
@@ -333,6 +351,14 @@ namespace Web
 
     void HTMLParser::handle_after_after_body(HTMLToken& token)
     {
+        if (token.is_doctype()
+            || token.is_parser_whitespace()
+            || (token.is_start_tag() && token.tag_name() == "html"))
+        {
+            process_using_the_rules_for(InsertionMode::InBody, token);
+            return;
+        }
+
         if (token.is_end_of_file()) {
             std::cout << "End of parsing!" << std::endl;
             return;

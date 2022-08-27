@@ -31,5 +31,15 @@ namespace Web {
             }
         }
 
+        if (node.is_text()) {
+            str.append(std::string(2 * indent, ' '));
+            str.append(node.to_string());
+            str.append("\n");
+
+            for(auto i : node.child_nodes()) {
+                dump_tree(str, *i, indent + 1);
+            }
+        }
+
     }
 }
