@@ -59,6 +59,7 @@ namespace Web
         void handle_in_body(HTMLToken&);
         void handle_after_body(HTMLToken&);
         void handle_after_after_body(HTMLToken&);
+        void handle_text(HTMLToken&);
 
         DOM::Node* current_node();
         DOM::Node* find_appropriate_place_for_inserting_node();
@@ -72,6 +73,8 @@ namespace Web
 
         const char* insertion_mode_name() const;
         InsertionMode m_insertion_mode{ InsertionMode::Initial };
+        InsertionMode m_original_insertion_mode{ InsertionMode::Initial };
+        
         std::vector<DOM::Node*> m_stack_of_open_elements;
         std::vector<DOM::Element*> m_list_of_active_formatting_elements;
 

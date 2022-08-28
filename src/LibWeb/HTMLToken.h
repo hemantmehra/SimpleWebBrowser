@@ -13,6 +13,7 @@ namespace Web {
     public:
         enum class Type
         {
+            Invalid,
             DOCTYPE,
             StartTag,
             EndTag,
@@ -70,7 +71,7 @@ namespace Web {
         std::string to_string() const;
 
     private:
-        Type m_type;
+        Type m_type{ Type::Invalid };
 
         struct {
             std::string name;

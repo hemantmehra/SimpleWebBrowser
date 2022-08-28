@@ -62,6 +62,10 @@ namespace Web
             case InsertionMode::AfterAfterBody:
                 handle_after_after_body(token);
                 break;
+
+            case InsertionMode::Text:
+                handle_text(token);
+                break;
             
             default:
                 assert(false);
@@ -145,6 +149,19 @@ namespace Web
 
     void HTMLParser::handle_in_head(HTMLToken& token)
     {
+        if (token.is_parser_whitespace()) {
+            insert_character(token.character());
+            return;
+        }
+
+        if (token.is_start_tag() && token.tag_name() == "title") {
+            insert_html_element(token);
+            m_tokenizer.switch_to(HTMLTokenizer::State::RCDATA);
+            m_original_insertion_mode = m_insertion_mode;
+            m_insertion_mode = InsertionMode::Text;
+            return;
+        }
+
         if (token.is_start_tag() && token.tag_name() == "meta") {
             auto element = insert_html_element(token);
             m_stack_of_open_elements.pop_back();
@@ -361,6 +378,25 @@ namespace Web
 
         if (token.is_end_of_file()) {
             std::cout << "End of parsing!" << std::endl;
+            return;
+        }
+        assert(false);
+    }
+
+    void HTMLParser::handle_text(HTMLToken& token)
+    {
+        if (token.is_character()) {
+            insert_character(token.character());
+            return;
+        }
+
+        if (token.is_end_tag() && token.tag_name() == "script") {
+            assert(false);
+        }
+
+        if (token.is_end_tag()) {
+            m_stack_of_open_elements.pop_back();
+            m_insertion_mode = m_original_insertion_mode;
             return;
         }
         assert(false);

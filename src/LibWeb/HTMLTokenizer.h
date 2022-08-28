@@ -94,7 +94,15 @@ namespace Web {
     public:
         explicit HTMLTokenizer(const std::string input) : m_input(input) {}
 
+        enum class State {
+#define __ENUMERATE_TOKENIZER_STATE(x) x,
+        ENUMERATE_TOKENIZER_STATES
+#undef __ENUMERATE_TOKENIZER_STATE
+        };
+
         HTMLToken next_token();
+
+        void switch_to(State new_state);
 
         void source();
 
@@ -103,12 +111,8 @@ namespace Web {
         std::optional<uint32_t> peek_input_char(size_t offset) const;
         bool match_next_chars(const std::string& s) const;
         void consume_chars(const std::string& s);
+        bool current_end_tag_token_is_appropriate();
 
-        enum class State {
-#define __ENUMERATE_TOKENIZER_STATE(x) x,
-        ENUMERATE_TOKENIZER_STATES
-#undef __ENUMERATE_TOKENIZER_STATE
-        };
 
         static const char* state_name(State state)
         {
@@ -123,9 +127,14 @@ namespace Web {
             assert(false);
         }
 
+        void will_emit(HTMLToken&);
+
         State m_state{ State::Data };
         State m_return_state{ State::Data };
+
+        std::string m_temporary_buffer;
 		HTMLToken m_current_token;
+        HTMLToken m_last_emitted_start_tag;
         std::string m_input;
         size_t m_cursor{ 0 };
 

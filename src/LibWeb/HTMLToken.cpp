@@ -27,6 +27,8 @@ namespace Web {
         case HTMLToken::Type::EndOfFile:
             s.append("EndOfFile");
             break;
+        case HTMLToken::Type::Invalid:
+            assert(false);
         default:
             break;
         }
