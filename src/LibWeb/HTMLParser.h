@@ -66,6 +66,7 @@ namespace Web
         DOM::Element* create_element_for(HTMLToken& token);
         DOM::Element* insert_html_element(HTMLToken& token);
         void insert_character(uint32_t data);
+        void insert_comment(HTMLToken& token);
         void generate_implied_end_tags();
         bool stack_of_open_elements_has_element_with_tag_name_in_scope(std::string tag_name);
         void reconstruct_the_active_formatting_elements();

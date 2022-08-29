@@ -20,6 +20,9 @@ namespace Web {
             break;
         case HTMLToken::Type::Comment:
             s.append("Comment");
+            s.append(" { ");
+            s.append(m_comment_or_character.data);
+            s.append(" } ");
             break;
         case HTMLToken::Type::Character:
             s.append("Character");

@@ -131,6 +131,47 @@ namespace Web {
                     consume_chars("DOCTYPE");
                     SET_STATE_AND_BREAK(State::DOCTYPE);
                 }
+
+                if (match_next_chars("--")) {
+                    consume_chars("--");
+                    SET_CURRENT_TOKEN(HTMLToken::Type::Comment);
+                    m_current_token.m_comment_or_character.data = "";
+                    SET_STATE_AND_BREAK(State::CommentStart);
+                }
+
+                assert(false);
+                break;
+            
+            case State::CommentStart:
+                if (ANYTHING_ELSE) {
+                    SET_STATE_DEC_CURSOR_AND_BREAK(State::Comment);
+                }
+                assert(false);
+                break;
+            
+            case State::Comment:
+                if (CURRENT_INPUT_CHAR_IS('-')) {
+                    SET_STATE_AND_BREAK(State::CommentEndDash);
+                }
+
+                if (ANYTHING_ELSE) {
+                    m_current_token.m_comment_or_character.data.push_back(current_input_char.value());
+                    continue;
+                }
+                assert(false);
+                break;
+            
+            case State::CommentEndDash:
+                if (CURRENT_INPUT_CHAR_IS('-')) {
+                    SET_STATE_AND_BREAK(State::CommentEnd);
+                }
+                assert(false);
+                break;
+
+            case State::CommentEnd:
+                if (CURRENT_INPUT_CHAR_IS('>')) {
+                    SET_STATE_AND_EMIT_TOKEN(State::Data);
+                }
                 assert(false);
                 break;
             

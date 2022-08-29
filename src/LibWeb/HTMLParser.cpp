@@ -1,4 +1,5 @@
 #include <HTMLParser.h>
+#include <DOM/Comment.h>
 #include <DOM/DocumentType.h>
 #include <DOM/ElementFactory.h>
 #include <DOM/Text.h>
@@ -147,10 +148,23 @@ namespace Web
         assert(false);
     }
 
+    void HTMLParser::insert_comment(HTMLToken& token)
+    {
+        auto data = token.m_comment_or_character.data;
+        auto adjusted_insertion_location = find_appropriate_place_for_inserting_node();
+        auto comment = new DOM::Comment(document(), data);
+        adjusted_insertion_location->append_child(comment);
+    }
+
     void HTMLParser::handle_in_head(HTMLToken& token)
     {
         if (token.is_parser_whitespace()) {
             insert_character(token.character());
+            return;
+        }
+
+        if (token.is_comment()) {
+            insert_comment(token);
             return;
         }
 

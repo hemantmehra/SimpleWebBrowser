@@ -23,6 +23,7 @@ target_sources(LibWeb
     ${CMAKE_CURRENT_LIST_DIR}/DOM/DocumentType.h
     ${CMAKE_CURRENT_LIST_DIR}/DOM/CharacterData.h
     ${CMAKE_CURRENT_LIST_DIR}/DOM/Text.h
+    ${CMAKE_CURRENT_LIST_DIR}/DOM/Comment.h
   )
 
 target_include_directories(LibWeb
