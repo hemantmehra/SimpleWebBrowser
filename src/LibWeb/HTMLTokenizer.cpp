@@ -407,6 +407,80 @@ namespace Web {
                 assert(false);
                 break;
             
+            case State::RAWTEXT:
+                if (CURRENT_INPUT_CHAR_IS('<')) {
+                    SET_STATE_AND_BREAK(State::RAWTEXTLessThanSign);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS(0)) {
+                    assert(false);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS_EOF) {
+                    SET_AND_EMIT_TOKEN(HTMLToken::Type::EndOfFile);
+                }
+
+                if (ANYTHING_ELSE) {
+                    EMIT_CURRENT_CHARACTER;
+                }
+                break;
+            
+            case State::RAWTEXTLessThanSign:
+                if (CURRENT_INPUT_CHAR_IS('/')) {
+                    m_temporary_buffer.clear();
+                    SET_STATE_AND_BREAK(State::RAWTEXTEndTagOpen);
+                }
+
+                if (ANYTHING_ELSE) {
+                    EMIT_CHARACTER('<');
+                    SET_STATE_DEC_CURSOR_AND_BREAK(State::RAWTEXT);
+                }
+                assert(false);
+                break;
+            
+            case State::RAWTEXTEndTagOpen:
+                if (CURRENT_INPUT_CHAR_IS_ALPHA) {
+                    SET_CURRENT_TOKEN(HTMLToken::Type::EndTag);
+                    SET_STATE_DEC_CURSOR_AND_BREAK(State::RAWTEXTEndTagName);
+                }
+
+                if (ANYTHING_ELSE) {
+                    assert(false);
+                }
+                assert(false);
+                break;
+            
+            case State::RAWTEXTEndTagName:
+                if (CURRENT_INPUT_CHAR_IS_WHITESPACE) {
+                    assert(false);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS('/')) assert(false);
+
+                if (CURRENT_INPUT_CHAR_IS('>')) {
+                    if (!current_end_tag_token_is_appropriate()) {
+                        assert(false);
+                    }
+                    SET_STATE_AND_EMIT_TOKEN(State::Data);
+                }
+
+                if (CURRENT_INPUT_CHAR_IS_UPPER_ALPHA) {
+                    m_current_token.m_tag.tag_name.push_back(tolower(current_input_char.value()));
+                    m_temporary_buffer.push_back(current_input_char.value());
+                    continue;
+                }
+
+                if (CURRENT_INPUT_CHAR_IS_LOWER_ALPHA) {
+                    m_current_token.m_tag.tag_name.push_back(current_input_char.value());
+                    m_temporary_buffer.push_back(current_input_char.value());
+                    continue;
+                }
+
+                if (ANYTHING_ELSE) assert(false);
+
+                assert(false);
+                break;
+            
             default:
                 assert(false);
                 break;

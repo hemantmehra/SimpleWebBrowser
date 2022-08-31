@@ -176,6 +176,13 @@ namespace Web
             return;
         }
 
+        if (token.is_start_tag() &&
+            ((token.tag_name() == "noscript" && m_scripting_enabled) ||
+            token.tag_name() == "noframes" || token.tag_name() == "style")) {
+            parse_generic_raw_text_element(token);
+            return;
+        }
+
         if (token.is_start_tag() && token.tag_name() == "meta") {
             auto element = insert_html_element(token);
             m_stack_of_open_elements.pop_back();
@@ -191,6 +198,15 @@ namespace Web
             return;
         }
         assert(false);
+    }
+
+    void HTMLParser::parse_generic_raw_text_element(HTMLToken& token)
+    {
+        insert_html_element(token);
+        m_tokenizer.switch_to(HTMLTokenizer::State::RAWTEXT);
+        m_original_insertion_mode = m_insertion_mode;
+        m_insertion_mode = InsertionMode::Text;
+        return;
     }
 
     void HTMLParser::insert_character(uint32_t data)

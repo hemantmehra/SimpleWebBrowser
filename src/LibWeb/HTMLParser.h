@@ -71,6 +71,7 @@ namespace Web
         bool stack_of_open_elements_has_element_with_tag_name_in_scope(std::string tag_name);
         void reconstruct_the_active_formatting_elements();
         void process_using_the_rules_for(InsertionMode, HTMLToken&);
+        void parse_generic_raw_text_element(HTMLToken&);
 
         const char* insertion_mode_name() const;
         InsertionMode m_insertion_mode{ InsertionMode::Initial };
@@ -87,5 +88,6 @@ namespace Web
         bool m_foster_parenting{ false };
         bool m_frameset_ok{ true };
         bool m_parsing_fragment{ false };
+        bool m_scripting_enabled{ false };
     };
 }
